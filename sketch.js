@@ -12,6 +12,7 @@ var bullets = 70;
 var gameState = "fight"
 var life = 3;
 var score = 0;
+var explosionSound , loseSound , winSound
 
 function preload(){
   
@@ -25,7 +26,9 @@ function preload(){
   zombieImg = loadImage("assets/zombie.png")
 
   bgImg = loadImage("assets/bg.jpeg")
-
+  explosionSound = loadSound("assets/explosion.mp3")
+  loseSound = loadSound("assets/lose.mp3")
+  winSound = loadSound("assets/win.mp3")
 }
 
 function setup() {
@@ -96,6 +99,7 @@ if(life===0){
 }
 if(score==100){
   gameState = "won"
+  winSound.play()
 }
 
   //moving the player up and down and making the game mobile compatible using touches
@@ -117,17 +121,20 @@ if(keyWentDown("space")){
   player.depth = player.depth+2
   player.addImage(shooter_shooting)
   bullets = bullets-1
+  explosionSound.play()
+
 }
 
 //player goes back to original standing image once we stop pressing the space bar
 else if(keyWentUp("space")){
   player.addImage(shooterImg)
+
 }
 
 //go to gameState "bullet" when player runs out of bullets
 if(bullets==0){
   gameState = "bullet"
-    
+    loseSound.play()
 }
 
 //destroy the zombie when bullet touches it
@@ -137,6 +144,8 @@ if(zombieGroup.isTouching(bulletGroup)){
    if(zombieGroup[i].isTouching(bulletGroup)){
         zombieGroup[i].destroy()
         bulletGroup.destroyEach()
+        score=score+2;
+        bullets=bullets-1
        
         } 
   
@@ -150,6 +159,7 @@ if(zombieGroup.isTouching(player)){
       
   if(zombieGroup[i].isTouching(player)){
        zombieGroup[i].destroy()
+       life=life-1;
        } 
  
  }
@@ -160,8 +170,11 @@ enemy();
 }
 
 drawSprites();
-
-
+textSize(30)
+fill("blue")
+text("lifes="+life,displayWidth-100,displayHeight-200)
+text("score="+score,displayWidth-120,displayHeight/2-150)
+text("bullets="+bullets,displayWidth-140,displayHeight/2-120)
 //destroy zombie and player and display a message in gameState "lost"
 if(gameState == "lost"){
   
@@ -195,7 +208,7 @@ else if(gameState == "bullet"){
   bulletGroup.destroyEach();
 
 }
-
+}
 
 
 
